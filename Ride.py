@@ -7,18 +7,15 @@ def MainMenu():
     white = (255,255,255)
     black = (0,0,0)
     width = 1024
-    height = 500
+    height = 400
     fps = 45
     clock = pygame.time.Clock()
     window = pygame.display.set_mode((width, height))
     pygame.display.set_caption("RIDE")
     font = pygame.font.SysFont('rod', 45)
     title_font = pygame.font.SysFont('arialblack', 72, bold=False)
-    bottom_font = pygame.font.SysFont('rod', 24, bold=True)
-    bg = pygame.image.load('bg.png')
-    sky = pygame.image.load('sky.png')
-    sun = pygame.image.load('sun.png')
-    horse = pygame.image.load('0.gif')
+    bg = pygame.image.load('bg_0.jpg')
+    
     start_x = 400
     start_y = 200
     exit_x = 400
@@ -28,17 +25,12 @@ def MainMenu():
         title_txt = title_font.render('RIDE' , True, black)
         start_txt = font.render('PLAY' , True, white)
         exit_text = font.render('EXIT', True, white)
-        bottom_txt = bottom_font.render('This game was inspired by Google Chrome Dinasaur Game', True, white)
-        window.blit(sky, (0,0))
-        window.blit(sun, (750,30))
-        window.blit(bg, (0,280))
+        window.blit(bg, (0,0))
         pygame.draw.rect(window ,black ,(start_x,start_y, 200, 40))
         pygame.draw.rect(window ,black ,(exit_x,exit_y, 200, 40))
         window.blit(title_txt, (400, 100))
         window.blit(start_txt, (start_x+50, start_y))
         window.blit(exit_text, (exit_x+50, exit_y))
-        window.blit(bottom_txt, (100, 400))
-        window.blit(horse, (180,200))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -61,17 +53,18 @@ def Play():
     black = (0,0,0)
     light_blue = (153,217,234)
     width = 1024
-    height = 500
-    fps = 45
+    height = 400
+    fps = 40
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption("RIDE")
-    font = pygame.font.SysFont('rod', 28)
-    replay_font = pygame.font.SysFont('verdana', 27)
+    font = pygame.font.SysFont('platino', 28)
     tip_font = pygame.font.SysFont('courier', 24, bold=True)
-    bg = pygame.image.load('bg.png')
-    sky = pygame.image.load('sky.png')
-    sun = pygame.image.load('sun.png')
+    cgt_font = pygame.font.SysFont('platino', 40, bold=True)
+    replay_btn = pygame.image.load('replay.png')
+    bg = [pygame.image.load('bg_0.jpg'),
+          pygame.image.load('bg_1.jpg'),
+          pygame.image.load('bg_2.jpg'),]
     
     obstacles = [pygame.image.load('rock.png'),
                  pygame.image.load('rocks_2.png'),
@@ -81,14 +74,16 @@ def Play():
 
     jumpCount = 0
     peak = 120
-    ground = 200
-    score = 0
+    ground = 180
+    score = 4990
+    distance = 0
+    levels = {range(300):5, range(600,1200):6, range(1200,2100):7, range(2100,5000):10}
     bg_x = 0
-    bg_y = 280
+    bg_y = 0
     temp_x = 1024
     temp_y = 230
     vel = 5
-
+    
     #Classes
     class MainChar(object):
         def __init__(self, x, y, w, h, vel):
@@ -97,7 +92,6 @@ def Play():
             self.w = w
             self.h = h
             self.vel = vel
-            self.life = 100
             self.index = 0
             self.animation = [pygame.image.load('0.gif'),
                               pygame.image.load('1.gif'),
@@ -119,48 +113,46 @@ def Play():
 
                 
 
-    knight = MainChar(180,200,100,90,5)
-
+    knight = MainChar(330,180,80,90,5)
     temp = random.choice(obstacles)
-    def replay_menu(score):
+    def replay_menu():
         while True:
             clock.tick(fps)
-            score_txt = replay_font.render('Score:   ' + str(score), True, white)
-            replay_text = replay_font.render('If you want to replay Press "R"', True, white)
-            screen.blit(score_txt, (420, 350))
-            screen.blit(replay_text, (300, 390))
+            pygame.draw.circle(screen, white, (522, 232), 32)
+            screen.blit(replay_btn, (490, 200))
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
 
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    click = pygame.mouse.get_pressed()
+                    if 490 < mouse[0] < 554 and 200 < mouse[1] < 264:
+                        Play()
+                        break
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_r]:
+            if keys[pygame.K_UP] or keys[pygame.K_SPACE]:
                     Play()
                     break
 
-
     def drawScreen():
-        screen.blit(sky, (0,0))
-        screen.blit(sun, (750,30))
-        screen.blit(bg, (bg_x,bg_y))
+        for i in range(3):
+            screen.blit(bg[i], (bg_x+(1024*i),bg_y))
         screen.blit(score_txt, (600, 0))
-        if score <= 70:screen.blit(tip_text, (100,100))
+        if score <= 30:screen.blit(tip_text, (100,100))
         knight.draw(screen)
         screen.blit(temp, (temp_x, temp_y))
-        #pygame.draw.rect(screen ,black ,(knight.x,knight.y, knight.w, knight.h),1)
-        #pygame.draw.rect(screen ,black ,(temp_x,temp_y, 50, 50),1)
+        if gameover: screen.blit(congrats, (400,130))
         pygame.display.update()
 
-    #SoundPlay
-    #pygame.mixer.music.load('horse-running.wav')
-    #pygame.mixer.music.play(30)
-
+    gameover = False
     isJump = False
     while True:
         clock.tick(fps)
         score_txt = font.render('Score: '+str(score), True, black)
         tip_text = tip_font.render('Jumpover rocks using UP_ARROW or SPACEBAR', True, black)
+        congrats = cgt_font.render('Congratulations!!', True, black)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
@@ -175,12 +167,12 @@ def Play():
             if jumpCount <= peak:
                 jumpCount += knight.vel
                 knight.y -= knight.vel
-            if jumpCount >= peak and knight.y< ground:
+            if jumpCount >= peak and knight.y < ground:
                 knight.y += knight.vel
             if knight.y >= ground:
                 jumpCount = 0
                 isJump = False
-        #GroundMotion
+        #Obstacles
         if temp_x >= 0:
             temp_x -= vel
         else:
@@ -188,18 +180,34 @@ def Play():
             temp_x = 1024
             
         if knight.x <= temp_x <= knight.x+knight.w and knight.y <= temp_y <= knight.y+knight.h:
-            replay_menu(score)
+            replay_menu()
             break
-            
-        if bg_x >= -1024:
+        #GroundMotion
+        if bg_x + width <= 1024:
             bg_x -= vel
-        else:
+        if bg_x + width*2 <= 1024:
+            temp_0 = bg[0]
+            temp_1 = bg[1]
+            bg.pop(0)
+            bg.append(temp_0)
+            bg.pop(1)
+            bg.append(temp_1)
             bg_x = 0
         #ScoreCount
-        if score % 500 == 0:
-            vel += 1
-        score += 1
+        if distance % 2 == 0:
+            score += 1
+        for lvl in levels.keys():
+            if score in lvl:
+                vel = levels.get(lvl)
+                knight.vel = vel
+                break
+        #Gameover
+        if score >= 5000:
+            gameover = True
+            
+        distance += 1
         drawScreen()
-        
+        if gameover == True:
+            replay_menu()  
     pygame.quit()
 MainMenu()
