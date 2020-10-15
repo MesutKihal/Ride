@@ -75,7 +75,7 @@ def Play():
     jumpCount = 0
     peak = 120
     ground = 180
-    score = 4990
+    score = 0
     distance = 0
     levels = {range(300):5, range(600,1200):6, range(1200,2100):7, range(2100,5000):10}
     bg_x = 0
