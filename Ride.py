@@ -1,6 +1,9 @@
 import pygame
 import random
 import sys
+import time
+from datetime import datetime
+
 
 def MainMenu():
     pygame.init()
@@ -77,7 +80,7 @@ def Play():
     ground = 180
     score = 0
     distance = 0
-    levels = {range(300):5, range(600,1200):6, range(1200,2100):7, range(2100,5000):10}
+    levels = {range(300):5, range(600,1200):6, range(1200,2100):7, range(2100,3400):9, range(3400,5000):10}
     bg_x = 0
     bg_y = 0
     temp_x = 1024
@@ -135,11 +138,19 @@ def Play():
             if keys[pygame.K_UP] or keys[pygame.K_SPACE]:
                     Play()
                     break
+    def convert(seconds):
+        seconds = seconds % (24 * 3600)
+        hour = seconds // 3600
+        seconds %= 3600
+        minutes = seconds // 60
+        seconds %= 60
 
+        return "%d:%02d:%02d" % (hour, minutes, seconds) 
     def drawScreen():
         for i in range(3):
             screen.blit(bg[i], (bg_x+(1024*i),bg_y))
         screen.blit(score_txt, (600, 0))
+        screen.blit(time_txt, (300, 0))
         if score <= 30:screen.blit(tip_text, (100,100))
         knight.draw(screen)
         screen.blit(temp, (temp_x, temp_y))
@@ -153,6 +164,7 @@ def Play():
         score_txt = font.render('Score: '+str(score), True, black)
         tip_text = tip_font.render('Jumpover rocks using UP_ARROW or SPACEBAR', True, black)
         congrats = cgt_font.render('Congratulations!!', True, black)
+        time_txt = font.render('Time: '+str(convert(distance//40)), True, black)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
@@ -199,12 +211,14 @@ def Play():
         for lvl in levels.keys():
             if score in lvl:
                 vel = levels.get(lvl)
-                knight.vel = vel
+                if not vel == 10:
+                    knight.vel = vel
+                else:
+                    knight.vel = 9
                 break
         #Gameover
         if score >= 5000:
             gameover = True
-            
         distance += 1
         drawScreen()
         if gameover == True:
