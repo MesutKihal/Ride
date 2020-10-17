@@ -63,7 +63,7 @@ def Play():
     pygame.display.set_caption("RIDE")
     font = pygame.font.SysFont('platino', 28)
     tip_font = pygame.font.SysFont('courier', 24, bold=True)
-    cgt_font = pygame.font.SysFont('platino', 40, bold=True)
+    msg_font = pygame.font.SysFont('platino', 40, bold=True)
     replay_btn = pygame.image.load('replay.png')
     bg = [pygame.image.load('bg_0.jpg'),
           pygame.image.load('bg_1.jpg'),
@@ -123,6 +123,8 @@ def Play():
             clock.tick(fps)
             pygame.draw.circle(screen, white, (522, 232), 32)
             screen.blit(replay_btn, (490, 200))
+            if gameover and score >= 5000: screen.blit(congrats, (380,130))
+            if gameover and score < 5000: screen.blit(itsover, (430,130))
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -144,8 +146,8 @@ def Play():
         seconds %= 3600
         minutes = seconds // 60
         seconds %= 60
-
-        return "%d:%02d:%02d" % (hour, minutes, seconds) 
+        return "%d:%02d:%02d" % (hour, minutes, seconds)
+    
     def drawScreen():
         for i in range(3):
             screen.blit(bg[i], (bg_x+(1024*i),bg_y))
@@ -154,7 +156,6 @@ def Play():
         if score <= 30:screen.blit(tip_text, (100,100))
         knight.draw(screen)
         screen.blit(temp, (temp_x, temp_y))
-        if gameover: screen.blit(congrats, (400,130))
         pygame.display.update()
 
     gameover = False
@@ -163,7 +164,8 @@ def Play():
         clock.tick(fps)
         score_txt = font.render('Score: '+str(score), True, black)
         tip_text = tip_font.render('Jumpover rocks using UP_ARROW or SPACEBAR', True, black)
-        congrats = cgt_font.render('Congratulations!!', True, black)
+        congrats = msg_font.render('CONGRATULATIONS!!', True, black)
+        itsover = msg_font.render('GAME OVER', True, black)
         time_txt = font.render('Time: '+str(convert(distance//40)), True, black)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -192,6 +194,7 @@ def Play():
             temp_x = 1024
             
         if knight.x <= temp_x <= knight.x+knight.w and knight.y <= temp_y <= knight.y+knight.h:
+            gameover = True
             replay_menu()
             break
         #GroundMotion
@@ -222,6 +225,6 @@ def Play():
         distance += 1
         drawScreen()
         if gameover == True:
-            replay_menu()  
+            replay_menu()
     pygame.quit()
 MainMenu()
