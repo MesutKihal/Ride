@@ -1,8 +1,6 @@
 import pygame
 import random
 import sys
-import time
-from datetime import datetime
 
 
 def MainMenu():
@@ -18,7 +16,6 @@ def MainMenu():
     font = pygame.font.SysFont('rod', 45)
     title_font = pygame.font.SysFont('arialblack', 72, bold=False)
     bg = pygame.image.load('bg_0.jpg')
-    
     start_x = 400
     start_y = 200
     exit_x = 400
@@ -68,7 +65,6 @@ def Play():
     bg = [pygame.image.load('bg_0.jpg'),
           pygame.image.load('bg_1.jpg'),
           pygame.image.load('bg_2.jpg'),]
-    
     obstacles = [pygame.image.load('rock.png'),
                  pygame.image.load('rocks_2.png'),
                  pygame.image.load('rocks_3.png'),
@@ -140,19 +136,11 @@ def Play():
             if keys[pygame.K_UP] or keys[pygame.K_SPACE]:
                     Play()
                     break
-    def convert(seconds):
-        seconds = seconds % (24 * 3600)
-        hour = seconds // 3600
-        seconds %= 3600
-        minutes = seconds // 60
-        seconds %= 60
-        return "%d:%02d:%02d" % (hour, minutes, seconds)
     
     def drawScreen():
         for i in range(3):
             screen.blit(bg[i], (bg_x+(1024*i),bg_y))
         screen.blit(score_txt, (600, 0))
-        screen.blit(time_txt, (300, 0))
         if score <= 30:screen.blit(tip_text, (100,100))
         knight.draw(screen)
         screen.blit(temp, (temp_x, temp_y))
@@ -166,7 +154,6 @@ def Play():
         tip_text = tip_font.render('Jumpover rocks using UP_ARROW or SPACEBAR', True, black)
         congrats = msg_font.render('CONGRATULATIONS!!', True, black)
         itsover = msg_font.render('GAME OVER', True, black)
-        time_txt = font.render('Time: '+str(convert(distance//40)), True, black)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
